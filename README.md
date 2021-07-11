@@ -71,13 +71,12 @@ Nowadays I feel the GPU and CUDA instalation is not too painfull as before.
 
 You can either, to  pull the Docker image from DockerHub or build it by your own.
 
-Let's start building a local Docker image from local Dockerfile. Please, run these commands:
+Let's start building a local Docker image from local Dockerfile. Please, run these commands below. The first one will build the Docker image and the other will test it. To enable GPU devices inside the container, don't forget "--gpus all" parameter in second command.
 
 ```
 $ docker build -t atari-ppo .
+$ docker run --gpus all atari-ppo
 ```
-
-
 
 
 

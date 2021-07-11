@@ -6,7 +6,12 @@ RUN chsh -s /bin/bash
 SHELL ["/bin/bash", "-c"]
 
 # Update OS packages
-RUN apt-get update
+RUN apt-get update -y
+
+# libglib2.0-0 packages (you will see it lines below) needs timezone to be installed.
+# Let's run the following command to set it beforehand and avoid the libglib2.0-0 ask us
+# about timezone at installation time (because it can broke Docker build pipeline)
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
 
 # Install packages 
 # wget: to install Anaconda
