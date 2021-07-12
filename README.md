@@ -1,21 +1,21 @@
 # Play Atari with Reinforcement Learning using Proximal Policy Optimization (PPO)
 
-Let's use [PPO](https://openai.com/blog/openai-baselines-ppo) from OpenAI to play Atari, a famous video game from 80's. AGAIN.
+Let's use [PPO](https://openai.com/blog/openai-baselines-ppo) from OpenAI to play Atari, a famous video game from 80's.
 
-So, it spend a long time since I first created this codes, but, at tha time, I didn't spend mutch time in documentation, then, I decided to run those scripts again and write some comments about it.
+So, it spend a long time since I first created these codes, but, at that time, I didn't spend mutch effort in documentation, then, I decided to run the scripts again and write some comments about it.
 
-Note: if you already tried to run some old Python after some time, time enough to Python change its version, you already know that the idea above will not work. 
+If you already tried to run some old Python program after some time, time enough to Python change its version, you already know that the idea above will not work. 
 
-So, let`s put these code to work. Again!
+So, let`s put these code to work, again!
 
-I decided to work in a solution to avoid the same problem in the future. Of course, Docker was my first shot.
+I decided to work in a solution to avoid the same problem in the future. Of course, Docker was my first shot. This is because, besides Python libraries, you need to install others packages to make OpenAI Gym run smoothly.
 
 # Setup
 
-All the command is based in Linux. Sorry (or not)
+All the command is based in Linux. Sorry (or not).
 
 ## GPU
-Since we are using GPU to accelerate the model train process, make sure all GPU drivers in your computer is fine. You can do that with the command
+Since we are using GPU to accelerate the model train process, make sure all GPU drivers in your computer is fine. You can do that with the command:
 
 ```
 $ nvidia-smi
@@ -47,16 +47,16 @@ $ nvidia-smi
 
 ```
 
-To enable GPU inside a Docker container, it necessary to install "NVIDIA Container Toolkit". To help you with that, check this site: 
+To enable GPU inside a Docker container, it's necessary to install "NVIDIA Container Toolkit". To help you with that, check this site: 
 
 https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker
 
-For Ubuntu 20.04, that other website also was very usefull for me, check it out: 
+For Ubuntu 20.04, this website also was very usefull for me: 
 
 https://www.server-world.info/en/note?os=Ubuntu_20.04&p=nvidia&f=2
 
 
-To make sure the GPU is working inside a Docker container, NVIDIA has a simple test for us. Run this Docker image:
+To make sure the GPU is working inside a Docker container, you can run the follow Docker image from NVIDIA:
 
 ```
 $ sudo docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi
@@ -71,14 +71,19 @@ Nowadays I feel the GPU and CUDA instalation is not too painfull as before.
 
 You can either, to  pull the Docker image from DockerHub or build it by your own.
 
-Let's start building a local Docker image from local Dockerfile. Please, run these commands below. The first one will build the Docker image and the other will test it. To enable GPU devices inside the container, don't forget "--gpus all" parameter in second command.
+Let's start building a local Docker image from local Dockerfile. Clone this repo and go inside de repo folder, where you can see the file called "Dockerfile". This is the file that Docker use to build images. It's a good idea to take a look in this file, there are some usefull comments in it.
 
 ```
 $ docker build -t atari-ppo .
-$ docker run --gpus all atari-ppo
 ```
 
+## Run Docker image that you just built in interactive mode.
 
+We sugest to map your local directory into the container, if you don't want to use your local files, you will see the project files inside the container anyway, because we clone it from GitHub at the building time. However, if you intend to change some code, it's better to map your local files to avoid to loose your work if happens the Docker crashs. Don't forget to enable GPU inside container with the parameter "--gpus all".
+
+```
+$ docker run --gpus all -it --rm -v $PWD:/workspace atari-ppo
+```
 
 ### Using Python Virtual Environment
 

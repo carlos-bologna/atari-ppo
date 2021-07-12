@@ -23,8 +23,7 @@ from lib.environment import atari_env
 def setup(env_id):
 
     # open read and overwrite.
-    #with open(os.path.join('conf', env_id + '.json'), 'r+') as json_file:
-    with open(f'src/conf/{env_id}.json', 'r+') as json_file:
+    with open(os.path.join('atari_envs_conf', env_id + '.json'), 'r+') as json_file:
 
         data = json.load(json_file)
 

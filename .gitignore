@@ -2,3 +2,4 @@ __pycache__/
 checkpoints/
 runs/
 myenv/
+atari_roms/

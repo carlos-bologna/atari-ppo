@@ -1,60 +1,33 @@
 # Use nvidia/cuda image
-FROM nvidia/cuda:11.4.0-devel-ubuntu20.04
-
-# Set bash as current shell
-RUN chsh -s /bin/bash
-SHELL ["/bin/bash", "-c"]
+FROM nvcr.io/nvidia/pytorch:21.06-py3
 
 # Update OS packages
 RUN apt-get update -y
 
-# libglib2.0-0 packages (you will see it lines below) needs timezone to be installed.
-# Let's run the following command to set it beforehand and avoid the libglib2.0-0 ask us
-# about timezone at installation time (because it can broke Docker build pipeline)
+# Some packages need timezone to be installed.
+# Let's run the following command to set it beforehand and avoid those 
+# packages ask us at installation time (because it can broke Docker build pipeline)
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
 
-# Install packages 
-# wget: to install Anaconda
-# git: to clone GitHub project repository
-# libglib2.0-0: to make cv2 Python lib to work
-RUN apt-get install -y wget git libglib2.0-0  && \
+# Install cv2 prerequisites and unrar
+RUN apt-get -y install ffmpeg libsm6 libxext6 unrar && \
     apt-get clean
 
-# Install Anaconda prerequisites
-RUN apt-get install -y libgl1-mesa-glx libegl1-mesa libxrandr2 libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6 && \
-    apt-get clean
+# Update base environment of Conda
+#RUN conda update -n base conda # <<<< Please, don't run that. It will break Pytorch.
 
-# Install Anaconda
-RUN wget --quiet https://repo.anaconda.com/archive/Anaconda3-2020.02-Linux-x86_64.sh -O ~/anaconda.sh && \
-    /bin/bash ~/anaconda.sh -b -p /opt/conda && \
-    rm ~/anaconda.sh && \
-    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
-    echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
-    find /opt/conda/ -follow -type f -name '*.a' -delete && \
-    find /opt/conda/ -follow -type f -name '*.js.map' -delete && \
-    /opt/conda/bin/conda clean -afy
-
-# Add Anaconda into path
-ENV PATH /opt/conda/bin:$PATH
-
-# Install all needed Python libs into conda virtual environment
+# Copy requirements file to Docker image
 COPY ./requirements.yaml /tmp/requirements.yaml
-RUN conda update conda \
-    && conda env create -f /tmp/requirements.yaml
 
-# Activate Conda environment
-RUN echo "conda activate atari-ppo" >> ~/.bashrc
+# Update base environment Conda in base Docker image with new packages
+RUN conda env update -f /tmp/requirements.yaml
 
-# Add Conda env into path
-ENV PATH /opt/conda/envs/atari-ppo/bin:$PATH
-
-# Set "home" dir as work dir
-WORKDIR /home
+# In order to use Atari environment with OpenAI Gym, you need install Atari ROMS
+# See: https://github.com/openai/atari-py#roms for more informations
+RUN wget http://www.atarimania.com/roms/Roms.rar -P /tmp && \
+    unrar x -r /tmp/Roms.rar /tmp && \
+    unzip /tmp/ROMS.zip -d /tmp && \
+    python -m atari_py.import_roms /tmp/ROMS
 
 # Clone Git repo (into home dir)
 RUN git clone https://github.com/carlos-bologna/atari-ppo.git
-
-# Set project directory as work dir
-WORKDIR /home/atari-ppo
-
-ENTRYPOINT ["python", "src/setup_test.py"]
