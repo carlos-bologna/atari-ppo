@@ -1,4 +1,5 @@
 {
+    "_comment": "Check src/ppo_train.py file to see comments about all parameters",
     "env_id": "BreakoutNoFrameskip-v4",
     "num_inputs": [
         1,
@@ -6,7 +7,7 @@
         80
     ],
     "num_outputs": 4,
-    "num_envs": 8,
+    "num_envs": 1,
     "learning_rate": 0.00025,
     "gamma": 0.99,
     "gae_lambda": 0.95,
@@ -14,7 +15,7 @@
     "critic_discount": 0.5,
     "entropy_beta": 0.01,
     "ppo_steps": 1024,
-    "mini_batch_size": 512,
+    "mini_batch_size": 16,
     "ppo_epochs": 3,
     "test_epochs": 9,
     "num_tests": 10,

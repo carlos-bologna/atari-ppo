@@ -49,17 +49,33 @@ def setup(env_id):
         global TRANSFORM_NAME
         global TRANSFORM_CLASS
 
-        ENV_ID          = data.setdefault('env_id', 'BreakoutNoFrameskip-v4')
+        #ENV_ID: Atari env name. "NoFrameskip-v4" means no frame skip and no action 
+        #repeat stochasticity (the game always follow your issued action)
+        ENV_ID          = data.setdefault('env_id', 'BreakoutNoFrameskip-v4') 
+        #NUM_INPUTS: observation space
         NUM_INPUTS      = data.setdefault('num_inputs', 26)
-        NUM_OUTPUTS     = data.setdefault('num_outputs', 6)
+        #NUM_OUTPUTS: actions space
+        NUM_OUTPUTS     = data.setdefault('num_outputs', 4)
+        #NUM_ENVS: multprocess simultaneous environments. The max is the number of cpu cores of your computer.
         NUM_ENVS        = data.setdefault('num_envs', 1)
+        #HIDDEN_SIZE: not in use.
         HIDDEN_SIZE     = data.get('hidden_size', 256)
+        #Model hyperparameter
         LEARNING_RATE   = data.setdefault('learning_rate', 1e-4)
+        #Model hyperparameter
         GAMMA           = data.setdefault('gamma', 0.99)
+        #Model hyperparameter
         GAE_LAMBDA      = data.setdefault('gae_lambda', 0.95)
+        #Model hyperparameter
         PPO_EPSILON     = data.setdefault('ppo_epsilon', 0.2)
+        #Model hyperparameter
         CRITIC_DISCOUNT = data.setdefault('critic_discount', 0.5)
+        #Model hyperparameter
         ENTROPY_BETA    = data.setdefault('entropy_beta', 0.001)
+        
+
+        STOP HERE
+
         PPO_STEPS       = data.setdefault('ppo_steps', 256)
         MINI_BATCH_SIZE = data.setdefault('mini_batch_size', 64)
         PPO_EPOCHS      = data.setdefault('ppo_epochs', 10)
@@ -108,12 +124,10 @@ def test_env(env, model, device, deterministic=True):
         total_reward += reward
     return total_reward
 
-
 def normalize(x):
     x -= x.mean()
     x /= (x.std() + 1e-8)
     return x
-
 
 def compute_gae(next_value, rewards, masks, values, gamma=0.99, lam=0.95):
     values = values + [next_value]
@@ -127,14 +141,12 @@ def compute_gae(next_value, rewards, masks, values, gamma=0.99, lam=0.95):
         returns.insert(0, gae + values[step])
     return returns
 
-
 def ppo_iter(states, actions, log_probs, returns, advantage):
     batch_size = states.size(0)
     # generates random mini-batches until we have covered the full batch
     for _ in range(batch_size // MINI_BATCH_SIZE):
         rand_ids = np.random.randint(0, batch_size, MINI_BATCH_SIZE)
         yield states[rand_ids, :], actions[rand_ids, :], log_probs[rand_ids, :], returns[rand_ids, :], advantage[rand_ids, :]
-
 
 def ppo_update(frame_idx, states, actions, log_probs, returns, advantages, clip_param=0.2):
     count_steps = 0
@@ -198,7 +210,8 @@ if __name__ == "__main__":
     # Autodetect CUDA
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
-    print('Device:', device)
+    print("~~~~~~Device Type~~~~~~")
+    print(device)
 
     # Prepare environments
     envs = [make_env(ENV_ID) for i in range(NUM_ENVS)]
@@ -210,6 +223,7 @@ if __name__ == "__main__":
     num_outputs = NUM_OUTPUTS #envs.action_space
 
     model = MODEL_CLASS(num_inputs, num_outputs, hidden_size=HIDDEN_SIZE).to(device)
+    print("~~~~~~Model Architecture~~~~~~")
     print(model)
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
