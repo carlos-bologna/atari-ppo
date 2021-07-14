@@ -85,6 +85,11 @@ We sugest to map your local directory into the container, if you don't want to u
 $ docker run --gpus all -it --rm -v $PWD:/workspace atari-ppo
 ```
 
+To see if Reinforcement Learning is playing Atari, run the the command below, inside of container:
+
+```
+python src/ppo_play.py -s checkpoints/BreakoutNoFrameskip-v4_best_+411.100_7188480.dat
+```
 ### Using Python Virtual Environment
 
 Another option is trying to use Python virtual environment to reproduce some work whenever you want, but it does not work if it spend time enough to Python change its version. At least it didn't work for me in this case.
