@@ -6,13 +6,18 @@ import numpy as np
 import torch
 import lib.model as models
 from lib.environment import atari_env
+from lib.multiprocessing_env import SubprocVecEnv
 
 DEFAULT_ENV_ID = "BreakoutNoFrameskip-v4"
+#DEFAULT_ENV_ID = "BreakoutDeterministic-v4"
 DEFAULT_MODEL_NAME = "ActorCriticLSTM"
 DEFAULT_HIDDEN_SIZE = 256
 DEFAULT_GAME_VIDEOS_FOLDER="game_videos"
 DEFAULT_INPUT_SPACE = (1, 80, 80)
 DEFAULT_ACTION_SPACE = 4
+NUM_ENVS = 1
+LIVES = 5
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -27,9 +32,8 @@ if __name__ == "__main__":
     use_cuda = torch.cuda.is_available()
     device   = torch.device("cuda" if use_cuda else "cpu")
 
-    #env = gym.make(args.env)
-    env = atari_env(args.env)
-    
+    env = atari_env(args.env)    
+
     if args.record:
         env = gym.wrappers.Monitor(env, args.record, force=True)
 
@@ -47,7 +51,8 @@ if __name__ == "__main__":
     done = False
     total_steps = 0
     total_reward = 0
-    while not done:
+
+    while LIVES != 0:
         state = torch.FloatTensor(state).unsqueeze(0).to(device)
         dist, _ = model(state)
         action = np.argmax(dist.probs.detach().cpu().numpy()) if args.deterministic \
@@ -56,5 +61,8 @@ if __name__ == "__main__":
         state = next_state
         total_reward += reward
         total_steps += 1
+        if done: 
+            LIVES -= 1
+            state = env.reset()
     env.env.close()
     print("In %d steps we got %.3f reward" % (total_steps, total_reward))

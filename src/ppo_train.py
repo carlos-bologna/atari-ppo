@@ -72,10 +72,6 @@ def setup(env_id):
         CRITIC_DISCOUNT = data.setdefault('critic_discount', 0.5)
         #Model hyperparameter
         ENTROPY_BETA    = data.setdefault('entropy_beta', 0.001)
-        
-
-        #################33STOP HERE
-
         PPO_STEPS       = data.setdefault('ppo_steps', 256)
         MINI_BATCH_SIZE = data.setdefault('mini_batch_size', 64)
         PPO_EPOCHS      = data.setdefault('ppo_epochs', 10)
@@ -204,9 +200,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     # Setup all constant
     setup(args.env)
-
-    print(NUM_INPUTS)
-    print(NUM_OUTPUTS)
 
     writer = SummaryWriter(comment="ppo_" + ENV_ID)
 

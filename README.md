@@ -81,15 +81,34 @@ $ docker build -t atari-ppo .
 
 We sugest to map your local directory into the container, if you don't want to use your local files, you will see the project files inside the container anyway, because we clone it from GitHub at the building time. However, if you intend to change some code, it's better to map your local files to avoid to loose your work if happens the Docker crashs. Don't forget to enable GPU inside container with the parameter "--gpus all".
 
+
+### For train:
+
+To train your reinforcement learning model to play Atari Breakout, just run:
+
 ```
-$ docker run --gpus all -it --rm -v $PWD:/workspace atari-ppo
+$ docker run --gpus all -v $PWD:/workspace atari-ppo
 ```
 
-To see if Reinforcement Learning is playing Atari, run the the command below, inside of container:
+### Just Interactive Mode
+
+Sometimes, we want to see inside the Docker container, run some commands in the shell, etc. The follow command, will replace the entrypoint of Docker, for the bash. To do this, just run:
 
 ```
-python src/ppo_play.py -s checkpoints/BreakoutNoFrameskip-v4_best_+411.100_7188480.dat
+$ docker run -it --gpus all -v $PWD:/workspace --entrypoint /bin/bash atari-ppo
 ```
+
+### For test
+
+After running the Docker in interactive mode, as explained above, run this Python command to see the best trained model in action. A video will be recorded at "game_videos" folder.
+
+```
+python src/ppo_play.py -s checkpoints/BreakoutNoFrameskip-v4_best_+411.100_7188480.dat 
+```
+
+You can change the parameter -s with other state dict, if you want it.
+
+
 ### Using Python Virtual Environment
 
 Another option is trying to use Python virtual environment to reproduce some work whenever you want, but it does not work if it spend time enough to Python change its version. At least it didn't work for me in this case.

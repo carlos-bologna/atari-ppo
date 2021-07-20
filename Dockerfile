@@ -31,3 +31,5 @@ RUN wget http://www.atarimania.com/roms/Roms.rar -P /tmp && \
 
 # Clone Git repo (into home dir)
 RUN git clone https://github.com/carlos-bologna/atari-ppo.git
+
+ENTRYPOINT ["python", "src/ppo_train.py"]
